@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "iconv-lite": "^0.6.3",
+    "serialport": "^10.4.0"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "name": "serial-service",
+  "version": "1.0.0",
+  "description": "Serial to TCP Service.",
+  "main": "server.js",
+  "author": "abao",
+  "license": "ISC"
+}
