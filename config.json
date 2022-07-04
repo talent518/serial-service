@@ -1,4 +1,5 @@
 {
   "com": "COM3",
-  "port": 2023
+  "port": 2023,
+  "baudRate": 230400
 }

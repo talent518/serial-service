@@ -18,7 +18,7 @@ const server = net.createServer(function(conn) {
 });
 const serialPort = new serial.SerialPort({
 	path: config.com,
-	baudRate: 921600,
+	baudRate: config.baudRate,
 	autoOpen: false
 });
 
