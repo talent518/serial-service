@@ -7,7 +7,6 @@ const conns = [];
 const server = net.createServer(function(conn) {
 	conns.push(conn);
 	conn.on('data', function(data) {
-		data = Buffer.from(data);
 		serialPort.write(data, function(e) {
 			if(e) console.error(e);
 		});
@@ -34,7 +33,6 @@ serialPort.open(function(e) {
 //console.log('end ,over!');
 
 serialPort.on('data', function(data) {
-	data = Buffer.from(data);
 	const str = iconv.decode(data, 'gbk');
 	process.stdout.write(str);
 	conns.forEach(function(conn, i) {
@@ -43,7 +41,6 @@ serialPort.on('data', function(data) {
 });
 
 process.stdin.on('data', function(data) {
-	data = Buffer.from(data);
 	serialPort.write(data, function(e) {
 		if(e) console.error(e);
 	});
