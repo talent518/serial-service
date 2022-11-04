@@ -30,13 +30,10 @@ serialPort.open(function(e) {
 	console.log('');
 });
 
-//console.log('end ,over!');
-
 serialPort.on('data', function(data) {
-	const str = iconv.decode(data, 'gbk');
-	process.stdout.write(str);
+	process.stdout.write(data);
 	conns.forEach(function(conn, i) {
-		conn.write(str);
+		conn.write(data);
 	});
 });
 
