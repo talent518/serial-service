@@ -31,15 +31,21 @@ serialPort.open(function(e) {
 });
 
 serialPort.on('data', function(data) {
-	process.stdout.write(data);
+	console.log('<', data.toString());
+	// process.stdout.write(data);
 	conns.forEach(function(conn, i) {
 		conn.write(data);
 	});
 });
 
+serialPort.on('close', function() {
+	process.exit();
+});
+
 process.stdin.on('data', function(data) {
-	serialPort.write(data, function(e) {
+	serialPort.write(data/*.toString().trim()+'\n'*/, function(e) {
 		if(e) console.error(e);
+		else console.log('>', data.toString());
 	});
 });
 
@@ -47,7 +53,6 @@ server.listen(config.port, function() {
 	console.log('Serial Service listen port is ' + config.port);
 });
 
-//≤∂ªÒ“Ï≥££¨∑¿÷π±¿¿£
 process.on('uncaughtException', function (e) {
 	console.error(e);
 });
