@@ -71,13 +71,15 @@ const run = async() => {
 	//await send('AT+CEREG?\r', 'OK');
 	//await send('AT+CGDCONT=1,"IP","cmnet"\r', 'OK');
 	//await send('AT+MIPCALL=1,1\r', 'OK');
-	await send('AT+MIPOPEN=0,"TCP","180.101.50.242",80\r', 'OK');
+	await send('AT+MIPOPEN=0,"TCP","180.101.50.242",80\r', '+MIPOPEN');
 	await send('AT+MIPMODE=0,1\r', 'CONNECT');
 	isRaw = true;
+	console.log('---Request begin---');
 	await send('GET / HTTP/1.1\r\nHost: www.baidu.com\r\nUser-Agent: curl/8.0.1\r\nAccept: */*\r\n\r\n', '</html>');
+	console.log('---Request end---');
 	isRaw = false;
 	await send('+++', 'OK');
 	await send('AT+MIPSACK=0\r', 'OK');
 	await send('AT+MIPCLOSE=0,1\r', 'MIPCLOSE');
-	console.log('---Completed---\r\n');
+	console.log('---Completed---');
 };
