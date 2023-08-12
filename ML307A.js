@@ -1,10 +1,18 @@
 const serial = require("serialport");
-const fs = require('fs');
-const net = require('net');
-const iconv = require('iconv-lite');
-const conns = [];
+if(process.argv.length < 3) {
+	console.error('node ML307A.js <path>');
+	serial.SerialPort.list().then(ports=>{
+		console.log(ports.filter(p=>{return (p.manufacturer || p.productId);}));
+		process.exit();
+	}).catch(e=>{
+		console.error(e);
+		process.exit();
+	});
+	return;
+}
+
 const serialPort = new serial.SerialPort({
-	path: 'com5',
+	path: process.argv[2],
 	baudRate: 115200,
 	autoOpen: false
 });

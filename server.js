@@ -6,20 +6,23 @@ const config = {
 	path: '',
 	baudRate: 115200,
 	port: 3888,
-	isHex: false,
+	sndHex: false,
+	rcvHex: false,
 };
 
 if(args.rate) config.baudRate = parseInt(args.rate);
 if(args.port) config.port = parseInt(args.port);
-if(args.hex) config.isHex = true;
+if(args.sndHex) config.sndHex = !config.sndHex;
+if(args.rcvHex) config.rcvHex = !config.rcvHex;
 
 if(args.path) config.path = args.path;
 else {
-	console.log('Usage: node server.js --path=<path> [--rate=<baudRate>] [--port=<port>] [--hex]');
+	console.log('Usage: node server.js --path=<path> [--rate=<baudRate>] [--port=<port>] [--sndHex] [--rcvHex]');
 	console.log('Configuration of default value:');
 	console.log('  baudRate: ' + config.baudRate);
 	console.log('  port: ' + config.port);
-	console.log('  dataMode: ' + (config.hex ? 'hex' : 'text'));
+	console.log('  sndHex: ' + config.sndHex);
+	console.log('  rcvHex: ' + config.rcvHex);
 	serial.SerialPort.list().then(ports=>{
 		console.log(ports.filter(p=>{return (p.manufacturer || p.productId);}));
 		process.exit();
@@ -57,7 +60,7 @@ serialPort.open(function(e) {
 });
 
 serialPort.on('data', function(data) {
-	if(config.isHex) console.log(data.toString('hex'));
+	if(config.rcvHex) console.log(data.toString('hex'));
 	else process.stdout.write(data);
 
 	conns.forEach(function(conn, i) {
@@ -75,7 +78,7 @@ serialPort.on('close', function() {
 });
 
 process.stdin.on('data', function(data) {
-	serialPort.write(config.isHex ? Buffer.from(data, 'hex') : data.toString().trim() + '\r\n', function(e) {
+	serialPort.write(config.sndHex ? Buffer.from(data, 'hex') : data.toString().trim() + '\r\n', function(e) {
 		if(e) console.error(e);
 	});
 });
