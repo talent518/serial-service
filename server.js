@@ -75,7 +75,7 @@ serialPort.on('close', function() {
 });
 
 process.stdin.on('data', function(data) {
-	serialPort.write(config.isHex ? Buffer.from(data, 'hex') : data, function(e) {
+	serialPort.write(config.isHex ? Buffer.from(data, 'hex') : data.toString().trim() + '\r\n', function(e) {
 		if(e) console.error(e);
 	});
 });
