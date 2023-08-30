@@ -8,21 +8,24 @@ const config = {
 	port: 3888,
 	sndHex: false,
 	rcvHex: false,
+	json: false,
 };
 
 if(args.rate) config.baudRate = parseInt(args.rate);
 if(args.port) config.port = parseInt(args.port);
 if(args.sndHex) config.sndHex = !config.sndHex;
 if(args.rcvHex) config.rcvHex = !config.rcvHex;
+if(args.json) config.json = !config.json;
 
 if(args.path) config.path = args.path;
 else {
-	console.log('Usage: node server.js --path=<path> [--rate=<baudRate>] [--port=<port>] [--sndHex] [--rcvHex]');
+	console.log('Usage: node server.js --path=<path> [--rate=<baudRate>] [--port=<port>] [--sndHex] [--rcvHex] [--json]');
 	console.log('Configuration of default value:');
 	console.log('  baudRate: ' + config.baudRate);
 	console.log('  port: ' + config.port);
 	console.log('  sndHex: ' + config.sndHex);
 	console.log('  rcvHex: ' + config.rcvHex);
+	console.log('  json: ' + config.json);
 	serial.SerialPort.list().then(ports=>{
 		console.log(ports.filter(p=>{return (p.manufacturer || p.productId);}));
 		process.exit();
@@ -59,8 +62,27 @@ serialPort.open(function(e) {
 	console.log('');
 });
 
+let buf, timer;
 serialPort.on('data', function(data) {
-	if(config.rcvHex) console.log(data.toString('hex'));
+	if(config.json) {
+		if(buf) {
+			data = Buffer.concat([buf, data]);
+			buf = null;
+		}
+
+		try {
+			console.log(JSON.parse(data.toString()));
+			clearTimeout(timer);
+		} catch(e) {
+			buf = data;
+			timer = setTimeout(function() {
+				if(!buf) return;
+
+				process.stdout.write(buf);
+				buf = null;
+			}, 100);
+		}
+	} else if(config.rcvHex) console.log(data.toString('hex'));
 	else process.stdout.write(data);
 
 	conns.forEach(function(conn, i) {
