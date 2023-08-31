@@ -70,17 +70,27 @@ serialPort.on('data', function(data) {
 			buf = null;
 		}
 
-		try {
-			console.log(JSON.parse(data.toString()));
-			clearTimeout(timer);
-		} catch(e) {
-			buf = data;
-			timer = setTimeout(function() {
-				if(!buf) return;
+		let pos, line;
+		while(data) {
+			pos = data.indexOf('\r\n');
+			if(pos > -1) {
+				line = data.subarray(0, pos).toString();
+				pos += 2;
+				if(pos < data.length) {
+					data = data.subarray(pos);
+				} else {
+					data = null;
+				}
 
-				process.stdout.write(buf);
-				buf = null;
-			}, 100);
+				try {
+					console.log(JSON.parse(line));
+				} catch(e) {
+					console.log(line);
+				}
+			} else {
+				buf = data;
+				break;
+			}
 		}
 	} else if(config.rcvHex) console.log(data.toString('hex'));
 	else process.stdout.write(data);
