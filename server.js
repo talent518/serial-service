@@ -56,6 +56,7 @@ const serialPort = new serial.SerialPort({
 serialPort.open(function(e) {
 	if(e) {
 		console.log('open serial '  + config.path + ' failure', e);
+		process.exit();
 	} else {
 		console.log('open serial '  + config.path + ' success');
 	}
