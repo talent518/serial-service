@@ -5,7 +5,7 @@ const conns = [];
 const config = {
 	path: '',
 	baudRate: 115200,
-	port: 3888,
+	port: 0,
 	sndHex: false,
 	rcvHex: false,
 	json: false,
@@ -116,9 +116,11 @@ process.stdin.on('data', function(data) {
 	});
 });
 
-server.listen(config.port, function() {
-	console.log('Serial Service listen port is ' + config.port);
-});
+if(config.port) {
+	server.listen(config.port, function() {
+		console.log('Serial Service listen port is ' + config.port);
+	});
+}
 
 process.on('uncaughtException', function (e) {
 	console.error(e);
