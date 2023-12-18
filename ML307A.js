@@ -79,7 +79,7 @@ const run = async() => {
 	//await send('AT+CEREG?\r', 'OK');
 	//await send('AT+CGDCONT=1,"IP","cmnet"\r', 'OK');
 	//await send('AT+MIPCALL=1,1\r', 'OK');
-	await send('AT+MIPOPEN=0,"TCP","180.101.50.242",80\r', '+MIPOPEN');
+	await send('AT+MIPOPEN=0,"TCP","www.baidu.com",80\r', '+MIPOPEN');
 	await send('AT+MIPMODE=0,1\r', 'CONNECT');
 	isRaw = true;
 	console.log('---Request begin---');
