@@ -27,7 +27,9 @@ else {
 	console.log('  rcvHex: ' + config.rcvHex);
 	console.log('  json: ' + config.json);
 	serial.SerialPort.list().then(ports=>{
-		console.log(ports.filter(p=>{return (p.manufacturer || p.productId);}));
+		const os = require('os');
+		const force = !os.machine().startsWith('x86');
+		console.log(ports.filter(p=>{return (force || p.manufacturer || p.productId);}));
 		process.exit();
 	}).catch(e=>{
 		console.error(e);
