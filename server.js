@@ -9,6 +9,8 @@ const config = {
 	sndHex: false,
 	rcvHex: false,
 	json: false,
+	raw: false,
+	rawMode: false,
 };
 
 if(args.rate) config.baudRate = parseInt(args.rate);
@@ -16,16 +18,20 @@ if(args.port) config.port = parseInt(args.port);
 if(args.sndHex) config.sndHex = !config.sndHex;
 if(args.rcvHex) config.rcvHex = !config.rcvHex;
 if(args.json) config.json = !config.json;
+if(args.raw) config.raw = !config.raw;
+if(args.rawMode) config.rawMode = !config.rawMode;
 
 if(args.path) config.path = args.path;
 else {
-	console.log('Usage: node server.js --path=<path> [--rate=<baudRate>] [--port=<port>] [--sndHex] [--rcvHex] [--json]');
+	console.log('Usage: node server.js --path=<path> [--rate=<baudRate>] [--port=<port>] [--sndHex] [--rcvHex] [--json] [--raw] [--rawMode]');
 	console.log('Configuration of default value:');
 	console.log('  baudRate: ' + config.baudRate);
 	console.log('  port: ' + config.port);
 	console.log('  sndHex: ' + config.sndHex);
 	console.log('  rcvHex: ' + config.rcvHex);
 	console.log('  json: ' + config.json);
+	console.log('  raw: ' + config.raw);
+	console.log('  rawMode: ' + config.rawMode);
 	serial.SerialPort.list().then(ports=>{
 		const os = require('os');
 		const force = !os.machine().startsWith('x86');
@@ -112,8 +118,9 @@ serialPort.on('close', function() {
 	process.exit();
 });
 
+if(config.rawMode) process.stdin.setRawMode(true);
 process.stdin.on('data', function(data) {
-	serialPort.write(config.sndHex ? Buffer.from(data, 'hex') : data.toString().trim() + '\r\n', function(e) {
+	serialPort.write(config.sndHex ? Buffer.from(data, 'hex') : (config.raw ? data : data.toString().trim() + '\r\n'), function(e) {
 		if(e) console.error(e);
 	});
 });
