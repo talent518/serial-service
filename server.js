@@ -44,6 +44,37 @@ else {
 	return;
 }
 
+Object.defineProperty(Number.prototype, 'toHexString', {
+	enumerable: false,
+	value: function(len, fill='0') {
+		return this.toString(16).toUpperCase().padStart(len, fill);
+	},
+});
+
+Object.defineProperty(Buffer.prototype, 'toHexString', {
+	enumerable: false,
+	value: function(sz = 2, separator = ' ') {
+		const list = [];
+		let i;
+		for(i = 0; i < this.length; i++) {
+			list.push(this.readUint8(i).toHexString(sz));
+		}
+		return list.join(separator);
+	},
+});
+
+Object.defineProperty(Buffer.prototype, 'toArray', {
+	enumerable: false,
+	value: function(n) {
+		const rets = [];
+		let i;
+		for(i = 0; i < this.length; i++) {
+			rets.push(this.readUint8(i));
+		}
+		return rets;
+	},
+});
+
 const server = net.createServer(function(conn) {
 	conns.push(conn);
 	conn.on('data', function(data) {
@@ -101,7 +132,7 @@ serialPort.on('data', function(data) {
 				break;
 			}
 		}
-	} else if(config.rcvHex) console.log(data.toString('hex'));
+	} else if(config.rcvHex) console.log('RX:', data.toHexString(2));
 	else process.stdout.write(data);
 
 	conns.forEach(function(conn, i) {
@@ -120,9 +151,29 @@ serialPort.on('close', function() {
 
 if(config.rawMode) process.stdin.setRawMode(true);
 process.stdin.on('data', function(data) {
-	serialPort.write(config.sndHex ? Buffer.from(data, 'hex') : (config.raw ? data : data.toString().trim() + '\r\n'), function(e) {
-		if(e) console.error(e);
-	});
+	if(config.sndHex) {
+		data = data.toString().trim();
+		if(/^([0-9a-fA-F]{2})+$/.test(data)) {
+			data = Buffer.from(data, 'hex');
+		} else {
+			const hexs = [];
+			data.split(/[^0-9a-fA-F]+/).forEach(function(chr) {
+				chr = parseInt(chr, 16);
+				if(!isNaN(chr) && chr >= 0 && chr < 256) {
+					hexs.push(chr.toHexString(2));
+				}
+			});
+			data = Buffer.from(hexs.join(''), 'hex');
+		}
+		serialPort.write(data, function(e) {
+			if(e) console.error(e);
+			else console.log('TX:', data.toHexString(2));
+		});
+	} else {
+		serialPort.write(config.raw ? data : data.toString().trim() + '\r\n', function(e) {
+			if(e) console.error(e);
+		});
+	}
 });
 
 if(config.port) {
