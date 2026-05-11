@@ -78,6 +78,9 @@ Object.defineProperty(Buffer.prototype, 'toArray', {
 const server = net.createServer(function(conn) {
 	conns.push(conn);
 	conn.on('data', function(data) {
+		if(config.sndHex) console.log('TX:', data.toHexString(2));
+		else process.stdout.write(data);
+
 		serialPort.write(data, function(e) {
 			if(e) console.error(e);
 		});
@@ -177,7 +180,7 @@ process.stdin.on('data', function(data) {
 });
 
 if(config.port) {
-	server.listen(config.port, function() {
+	server.listen(config.port, '0.0.0.0', function() {
 		console.log('Serial Service listen port is ' + config.port);
 	});
 }
